@@ -6,6 +6,7 @@ public abstract class List<T> {
 
     public abstract <U> List<U> map(Function<T, U> f);
     public abstract <U> U foldLeft(U identity, Function<U, Function<T, U>> f);
+    public abstract int size();
 
     public static <T> List<T> list() {
         return new Empty<>();
@@ -24,6 +25,10 @@ public abstract class List<T> {
         return new Cons<>(t, this);
     }
 
+    public List<T> concat(List<T> list) {
+        return foldLeft(list, acc -> head -> new Cons<>(head, list));
+    }
+
     private static class Empty<T> extends List<T> {
 
         @Override
@@ -34,6 +39,11 @@ public abstract class List<T> {
         @Override
         public <U> U foldLeft(U identity, Function<U, Function<T, U>> f) {
             return identity;
+        }
+
+        @Override
+        public int size() {
+            return 0;
         }
 
         @Override
@@ -65,6 +75,11 @@ public abstract class List<T> {
         @Override
         public <U> U foldLeft(U identity, Function<U, Function<T, U>> f) {
             return tail.foldLeft(f.apply(identity).apply(head), f);
+        }
+
+        @Override
+        public int size() {
+            return 1 + tail.size();
         }
     }
 }
