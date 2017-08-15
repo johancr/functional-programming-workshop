@@ -22,8 +22,8 @@ public abstract class Validation<E, T> {
     public static <T, E> Validation<E, List<T>> sequence(List<Validation<E, T>> validations) {
 
         return validations.foldLeft(
-                Validation.success(List.list()),
-                x -> y -> Validation.map2(x, y, a -> a::append));
+                success(List.list()),
+                x -> y -> map2(x, y, a -> a::append));
     }
 
     public static <T, T2, E, U> Validation<E, U> map2(Validation<E, T> v1,
@@ -40,7 +40,7 @@ public abstract class Validation<E, T> {
     }
 
     public <U> Validation<E, U> ap(Validation<E, Function<T, U>> f) {
-        return Validation.map2(this, f, x -> y -> y.apply(x));
+        return map2(this, f, x -> y -> y.apply(x));
     }
 
     private static class Success<E, T> extends Validation<E, T> {
