@@ -1,15 +1,11 @@
 package com.kambi.func.solutions;
 
+import com.kambi.func.examples.SideEffect;
+
 import java.util.function.Function;
 
 
 public abstract class Validation<E, T> {
-
-    public abstract <U> U fold(Function<T, U> onSuccess, Function<List<E>, U> onFailure);
-
-    public static <E, T> Validation<E, T> success(T value) {
-        return new Success<>(value);
-    }
 
     public static <E, T> Validation<E, T> failure(E failure) {
         return failure(List.list(failure));
@@ -26,6 +22,10 @@ public abstract class Validation<E, T> {
                 x -> y -> map2(x, y, a -> a::append));
     }
 
+    public static <E, T> Validation<E, T> success(T value) {
+        return new Success<>(value);
+    }
+
     public static <T, T2, E, U> Validation<E, U> map2(Validation<E, T> v1,
                                                       Validation<E, T2> v2,
                                                       Function<T, Function<T2, U>> f) {
@@ -38,6 +38,10 @@ public abstract class Validation<E, T> {
                         v2.fold(value2 -> failure(failure1),
                                 failure2 -> failure(failure1.concat(failure2))));
     }
+
+    public abstract <U> U fold(Function<T, U> onSuccess, Function<List<E>, U> onFailure);
+
+    public abstract void ifSuccess(SideEffect<T> effect);
 
     public <U> Validation<E, U> ap(Validation<E, Function<T, U>> f) {
         return map2(this, f, x -> y -> y.apply(x));
@@ -55,6 +59,11 @@ public abstract class Validation<E, T> {
         public <U> U fold(Function<T, U> onSuccess, Function<List<E>, U> onFailure) {
             return onSuccess.apply(value);
         }
+
+        @Override
+        public void ifSuccess(SideEffect<T> effect) {
+            effect.run(value);
+        }
     }
 
     private static class Failure<E, T> extends Validation<E, T> {
@@ -68,6 +77,10 @@ public abstract class Validation<E, T> {
         @Override
         public <U> U fold(Function<T, U> onSuccess, Function<List<E>, U> onFailure) {
             return onFailure.apply(failures);
+        }
+
+        @Override
+        public void ifSuccess(SideEffect<T> effect) {
         }
     }
 }

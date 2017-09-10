@@ -1,4 +1,4 @@
-package com.kambi.func.examples;
+package com.kambi.func.solutions;
 
 import org.junit.Test;
 
@@ -12,9 +12,12 @@ public class AttemptTest {
 
         int result;
 
-        try {
+        try
+        {
             result = 1 / 0;
-        } catch (ArithmeticException ex) {
+        }
+        catch (ArithmeticException ex)
+        {
             result = 0;
         }
 
@@ -28,14 +31,14 @@ public class AttemptTest {
         assertThat(attempt.isSuccess(), is(true));
     }
 
+    private static int divide(int a, int b) {
+        return a / b;
+    }
+
     @Test
     public void exceptions_failure() {
         Attempt<Integer> attempt = Attempt.attempt(() -> divide(1, 0));
 
         assertThat(attempt.isSuccess(), is(false));
-    }
-
-    private static int divide(int a, int b) {
-        return a / b;
     }
 }

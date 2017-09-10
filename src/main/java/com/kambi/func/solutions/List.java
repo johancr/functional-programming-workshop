@@ -1,12 +1,16 @@
 package com.kambi.func.solutions;
 
+import com.kambi.func.examples.SideEffect;
+
 import java.util.function.Function;
 
 public abstract class List<T> {
 
-    public abstract <U> List<U> map(Function<T, U> f);
+    public static <T> List<T> flatten(List<List<T>> list) {
+        return list.foldLeft(list(), acc -> acc::concat);
+    }
+
     public abstract <U> U foldLeft(U identity, Function<U, Function<T, U>> f);
-    public abstract int size();
 
     public static <T> List<T> list() {
         return new Empty<>();
@@ -15,7 +19,8 @@ public abstract class List<T> {
     @SafeVarargs
     public static <T> List<T> list(T... args) {
         List<T> list = List.list();
-        for (int i = args.length - 1; i >= 0; i--) {
+        for (int i = args.length - 1; i >= 0; i--)
+        {
             list = list.append(args[i]);
         }
         return list;
@@ -25,15 +30,21 @@ public abstract class List<T> {
         return new Cons<>(t, this);
     }
 
+    public abstract <U> List<U> map(Function<T, U> f);
+
+    public abstract int size();
+
     public List<T> concat(List<T> list) {
         return foldLeft(list, acc -> head -> new Cons<>(head, list));
     }
 
+    public abstract void forEach(SideEffect<T> effect);
+
     private static class Empty<T> extends List<T> {
 
         @Override
-        public <U> List<U> map(Function<T, U> f) {
-            return List.list();
+        public String toString() {
+            return "EMPTY";
         }
 
         @Override
@@ -42,13 +53,17 @@ public abstract class List<T> {
         }
 
         @Override
+        public <U> List<U> map(Function<T, U> f) {
+            return List.list();
+        }
+
+        @Override
         public int size() {
             return 0;
         }
 
         @Override
-        public String toString() {
-            return "EMPTY";
+        public void forEach(SideEffect<T> effect) {
         }
     }
 
@@ -80,6 +95,12 @@ public abstract class List<T> {
         @Override
         public int size() {
             return 1 + tail.size();
+        }
+
+        @Override
+        public void forEach(SideEffect<T> effect) {
+            effect.run(head);
+            tail.forEach(effect);
         }
     }
 }

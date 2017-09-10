@@ -60,7 +60,7 @@ public class ValidationTest {
 
         Validation<String, Integer> a1 = Validation.success(1);
         Validation<String, Integer> a2 = Validation.success(1);
-        Validation<String, Integer> b = a2.ap(a1.ap((Validation.<String, Function<Integer, Function<Integer, Integer>>>success(x -> y -> x + y + 1))));
+        Validation<String, Integer> b = a2.ap(a1.ap((Validation.success(x -> y -> x + y + 1))));
 
         String x = b.fold(String::valueOf, j -> "");
 

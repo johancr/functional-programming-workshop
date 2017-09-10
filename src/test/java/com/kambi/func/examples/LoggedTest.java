@@ -1,8 +1,8 @@
 package com.kambi.func.examples;
 
+import com.kambi.func.solutions.List;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.logging.Logger;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -31,7 +31,7 @@ public class LoggedTest {
                 .flatMap(value -> Logged.log(value * 2, "doubling..."));
 
         assertThat(result.getValue(), is(2));
-        assertThat(result.getLog(), is(Arrays.asList("computing...", "doubling...")));
+        assertThat(result.getLog().toString(), is(List.list("computing...", "doubling...").toString()));
     }
 
     private static int pureComputation() {
