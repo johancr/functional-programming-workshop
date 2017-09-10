@@ -24,4 +24,28 @@ public class CompositionTest {
 
         send(createRequest.apply(id));
     }
+
+    @Test
+    public void partialApplication() {
+        Function<EventMapping, ImpRequest> createImpRequest = createImpRequest();
+
+        EventMapping eventMapping = new EventMapping(GOOD_ID);
+        ImpRequest request = createImpRequest.apply(eventMapping);
+
+        send(request);
+    }
+
+    private Function<EventMapping, ImpRequest> createImpRequest() {
+        ImpRequestRepository impRequestRepository = new ImpRequestRepository();
+        return createAndSaveImpRequest().apply(impRequestFactory).apply(impRequestRepository);
+    }
+
+    private Function<ImpRequestFactory, Function<ImpRequestRepository, Function<EventMapping, ImpRequest>>> createAndSaveImpRequest() {
+        return factory -> repository -> eventMapping ->
+        {
+            ImpRequest impRequest = factory.create(eventMapping);
+            repository.save(impRequest);
+            return impRequest;
+        };
+    }
 }
