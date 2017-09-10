@@ -3,9 +3,12 @@ package com.kambi.func.niro;
 import com.kambi.func.solutions.Attempt;
 import org.junit.Test;
 
+import java.time.Instant;
+import java.util.function.Function;
+
+import static com.kambi.func.niro.BetDiagnosticRepository.*;
 import static com.kambi.func.niro.EventId.*;
-import static com.kambi.func.solutions.Attempt.attempt;
-import static com.kambi.func.solutions.Attempt.lift;
+import static com.kambi.func.solutions.Attempt.*;
 
 public class AttemptTest {
 
@@ -36,7 +39,6 @@ public class AttemptTest {
                         System.err::println);
     }
 
-
     @Test
     public void handlingAttempt_retake() {
         EventId id = GOOD_ID;
@@ -48,4 +50,72 @@ public class AttemptTest {
                         System.err::println);
     }
 
+    @Test
+    public void betDiagnostic_no_map2() {
+
+        String ticket = NO_DATE_TICKET;
+
+        Attempt<BetDiagnostic> betDiagnostic =
+                findOutcome(ticket).flatMap(outcome ->
+                        findCreatedDate(ticket).map(createdDate ->
+                                BetDiagnostic.of(ticket, outcome, createdDate)));
+
+        betDiagnostic.forEach(System.out::println,
+                System.err::println);
+    }
+
+    @Test
+    public void betDiagnostic_map2() {
+
+        String ticket = NO_DATE_TICKET;
+
+        Attempt<BetDiagnostic> betDiagnostic =
+                map2(findOutcome(ticket), findCreatedDate(ticket),
+                        createBetDiagnostic(ticket));
+
+        betDiagnostic.forEach(System.out::println,
+                System.err::println);
+    }
+
+    private Function<Integer, Function<Instant, BetDiagnostic>> createBetDiagnostic(String ticket) {
+        return outcome -> createdDate -> BetDiagnostic.of(ticket, outcome, createdDate);
+    }
+
+    @Test
+    public void betDiagnostic_no_map4() {
+
+        String ticket = GOOD_TICKET;
+
+        Attempt<BetDiagnostic> betDiagnostic =
+                findState(ticket).flatMap(state ->
+                        findPayoutStatus(ticket).flatMap(payoutStatus ->
+                                findOutcome(ticket).flatMap(outcome ->
+                                        findCreatedDate(ticket)
+                                                .map(createdDate ->
+                                                        BetDiagnostic.of(ticket, state, payoutStatus, outcome, createdDate)))));
+
+        betDiagnostic.forEach(System.out::println,
+                System.err::println);
+    }
+
+    @Test
+    public void betDiagnostic_map4() {
+
+        String ticket = GOOD_TICKET;
+
+        Attempt<BetDiagnostic> betDiagnostic =
+                map4(findState(ticket),
+                        findPayoutStatus(ticket),
+                        findOutcome(ticket),
+                        findCreatedDate(ticket),
+                        createCompleteBetDiagnostic(ticket));
+
+        betDiagnostic.forEach(System.out::println,
+                System.err::println);
+    }
+
+    private Function<String, Function<String, Function<Integer, Function<Instant, BetDiagnostic>>>> createCompleteBetDiagnostic(String ticket) {
+        return state -> payoutStatus -> outcome -> createdDate ->
+                BetDiagnostic.of(ticket, state, payoutStatus, outcome, createdDate);
+    }
 }
