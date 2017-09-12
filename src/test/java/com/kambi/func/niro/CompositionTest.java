@@ -27,17 +27,14 @@ public class CompositionTest {
 
     @Test
     public void partialApplication() {
-        Function<EventMapping, ImpRequest> createImpRequest = createImpRequest();
+        ImpRequestRepository impRequestRepository = new FakeImpRequestRepository();
+        Function<EventMapping, ImpRequest> createImpRequest =
+                createAndSaveImpRequest().apply(impRequestFactory).apply(impRequestRepository);
 
         EventMapping eventMapping = new EventMapping(GOOD_ID);
         ImpRequest request = createImpRequest.apply(eventMapping);
 
         send(request);
-    }
-
-    private Function<EventMapping, ImpRequest> createImpRequest() {
-        ImpRequestRepository impRequestRepository = new ImpRequestRepository();
-        return createAndSaveImpRequest().apply(impRequestFactory).apply(impRequestRepository);
     }
 
     private Function<ImpRequestFactory, Function<ImpRequestRepository, Function<EventMapping, ImpRequest>>> createAndSaveImpRequest() {
@@ -47,5 +44,13 @@ public class CompositionTest {
             repository.save(impRequest);
             return impRequest;
         };
+    }
+
+    private static class FakeImpRequestRepository implements ImpRequestRepository {
+
+        @Override
+        public void save(ImpRequest impRequest) {
+            System.out.println("Not really accessing the database");
+        }
     }
 }

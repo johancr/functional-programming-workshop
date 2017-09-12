@@ -1,8 +1,6 @@
 package com.kambi.func.niro;
 
-public class ImpRequestRepository {
+public interface ImpRequestRepository {
 
-    public void save(ImpRequest impRequest) {
-        System.out.println("Saving imp request");
-    }
+    void save(ImpRequest impRequest);
 }
