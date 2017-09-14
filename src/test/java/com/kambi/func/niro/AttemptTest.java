@@ -28,18 +28,6 @@ public class AttemptTest {
     }
 
     @Test
-    public void handlingAttempt_lift() {
-        EventId id = NOT_MAPPABLE_ID;
-
-        lift(eventRepository::findEventOrThrow)
-                .andThen(lift(eventMappingService::processEventOrThrow))
-                .andThen(lift(impRequestFactory::create))
-                .apply(Attempt.success(id))
-                .forEach(ImpMessageProcessor::send,
-                        System.err::println);
-    }
-
-    @Test
     public void handlingAttempt_retake() {
         EventId id = GOOD_ID;
 
@@ -117,5 +105,17 @@ public class AttemptTest {
     private Function<String, Function<String, Function<Integer, Function<Instant, BetDiagnostic>>>> createCompleteBetDiagnostic(String ticket) {
         return state -> payoutStatus -> outcome -> createdDate ->
                 BetDiagnostic.of(ticket, state, payoutStatus, outcome, createdDate);
+    }
+
+    @Test
+    public void handlingAttempt_lift() {
+        EventId id = NOT_MAPPABLE_ID;
+
+        lift(eventRepository::findEventOrThrow)
+                .andThen(lift(eventMappingService::processEventOrThrow))
+                .andThen(lift(impRequestFactory::create))
+                .apply(Attempt.success(id))
+                .forEach(ImpMessageProcessor::send,
+                        System.err::println);
     }
 }
