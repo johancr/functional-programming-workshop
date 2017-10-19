@@ -22,6 +22,8 @@ public abstract class Option<T> {
 
     public abstract void ifPresent(SideEffect<T> effect);
 
+    public abstract boolean isPresent();
+
     private static class None<T> extends Option<T> {
 
         @Override
@@ -41,6 +43,11 @@ public abstract class Option<T> {
 
         @Override
         public void ifPresent(SideEffect<T> effect) {
+        }
+
+        @Override
+        public boolean isPresent() {
+            return false;
         }
     }
 
@@ -70,6 +77,11 @@ public abstract class Option<T> {
         @Override
         public void ifPresent(SideEffect<T> effect) {
             effect.run(value);
+        }
+
+        @Override
+        public boolean isPresent() {
+            return true;
         }
     }
 }
