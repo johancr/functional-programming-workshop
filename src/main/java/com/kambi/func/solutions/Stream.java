@@ -50,6 +50,8 @@ public abstract class Stream<T> {
 
     public abstract Option<T> find(Function<T, Boolean> p);
 
+    public abstract T foldLeft(T acc, Function<T, Function<T, T>> f);
+
     public abstract T foldRight(T z, Function<T, Function<T, T>> f);
 
     private static class Cons<T> extends Stream<T> {
@@ -111,8 +113,13 @@ public abstract class Stream<T> {
         }
 
         @Override
+        public T foldLeft(T acc, Function<T, Function<T, T>> f) {
+            return tail().foldLeft(f.apply(acc).apply(head), f);
+        }
+
+        @Override
         public T foldRight(T z, Function<T, Function<T, T>> f) {
-            return tail().foldRight(f.apply(head).apply(z), f);
+            return f.apply(head).apply(tail().foldRight(z, f));
         }
 
         private List<T> toList(List<T> acc) {
@@ -139,7 +146,7 @@ public abstract class Stream<T> {
 
         @Override
         public Stream<T> take(int n) {
-            throw new IllegalStateException("take() called on empty stream");
+            return this;
         }
 
         @Override
@@ -160,6 +167,11 @@ public abstract class Stream<T> {
         @Override
         public Option<T> find(Function<T, Boolean> p) {
             return Option.none();
+        }
+
+        @Override
+        public T foldLeft(T acc, Function<T, Function<T, T>> f) {
+            return acc;
         }
 
         @Override

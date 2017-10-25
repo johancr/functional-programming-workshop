@@ -95,7 +95,8 @@ public class StreamTest {
 
     @Test
     public void lazy() {
-        Stream<Integer> s = Stream.iterate(0, x -> {
+        Stream<Integer> s = Stream.iterate(0, x ->
+        {
             throw new RuntimeException("Boom!");
         });
 
@@ -107,9 +108,16 @@ public class StreamTest {
     }
 
     @Test
-    public void foldRight() {
-        Stream<Integer> s = Stream.repeat(1);
+    public void foldLeft() {
+        Stream<Integer> s = Stream.iterate(1, x -> x + 1);
 
-        assertThat(s.take(3).foldRight(0, x -> acc -> x + acc), is(3));
+        assertThat(s.take(3).foldLeft(0, acc -> x -> acc + x), is(6));
+    }
+
+    @Test
+    public void foldRight() {
+        Stream<Integer> s = Stream.iterate(1, x -> x + 1);
+
+        assertThat(s.take(3).foldRight(0, x -> acc -> acc + x), is(6));
     }
 }

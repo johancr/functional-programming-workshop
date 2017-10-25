@@ -29,6 +29,7 @@ public class StreamTest {
         assertThat(s.head(), is(1));
     }
 
+    /*
     @Test
     public void multipleItems() {
         Stream<Integer> s = Stream.of(1, 2, 3);
@@ -38,6 +39,7 @@ public class StreamTest {
         assertThat(s.tail().tail().head(), is(3));
     }
 
+    /*
     @Test
     public void repeat() {
         Stream<Integer> s = Stream.repeat(1);
@@ -47,6 +49,7 @@ public class StreamTest {
         assertThat(s.tail().tail().head(), is(1));
     }
 
+    /*
     @Test
     public void iterate() {
         Stream<Integer> s = Stream.iterate(1, x -> x + 1);
@@ -56,6 +59,7 @@ public class StreamTest {
         assertThat(s.tail().tail().head(), is(3));
     }
 
+    /*
     @Test
     public void drop() {
         Stream<Integer> s = Stream.iterate(1, x -> x + 1).drop(2);
@@ -65,6 +69,7 @@ public class StreamTest {
         assertThat(s.tail().tail().head(), is(5));
     }
 
+    /*
     @Test
     public void take() {
         Stream<Integer> s = Stream.iterate(1, x -> x + 1).take(2);
@@ -72,6 +77,7 @@ public class StreamTest {
         assertThat(s.toList().toString(), is(List.list(1, 2).toString()));
     }
 
+    /*
     @Test
     public void map() {
         Stream<Integer> s = Stream.of(1, 2).map(x -> x + 1);
@@ -80,6 +86,7 @@ public class StreamTest {
         assertThat(s.tail().head(), is(3));
     }
 
+    /*
     @Test
     public void filter() {
         Stream<Integer> s = Stream.of(1, 2).filter(x -> x == 2);
@@ -87,6 +94,7 @@ public class StreamTest {
         assertThat(s.head(), is(2));
     }
 
+    /*
     @Test
     public void find() {
         Stream<Integer> s = Stream.of(1, 2);
@@ -95,6 +103,7 @@ public class StreamTest {
         assertThat(s.find(x -> x == 3).isPresent(), is(false));
     }
 
+    /*
     @Test
     public void lazy() {
         Stream<Integer> s = Stream.iterate(0, x -> {
@@ -108,11 +117,20 @@ public class StreamTest {
         assertThat(s.take(2).filter(x -> x == 0).map(x -> x + 1).tail().head(), is(1));
     }
 
+    /*
+    @Test
+    public void foldLeft() {
+        Stream<Integer> s = Stream.iterate(1, x -> x + 1);
+
+        assertThat(s.take(3).foldLeft(0, acc -> x -> acc + x), is(6));
+    }
+
+    /*
     @Test
     public void foldRight() {
-        Stream<Integer> s = Stream.repeat(1);
+        Stream<Integer> s = Stream.iterate(1, x -> x + 1);
 
-        assertThat(s.take(3).foldRight(0, x -> acc -> x + acc), is(3));
+        assertThat(s.take(3).foldRight(0, x -> acc -> acc + x), is(6));
     }
     //*/
 }
