@@ -7,10 +7,12 @@ import java.util.function.Function;
 public abstract class List<T> {
 
     public static <T> List<T> flatten(List<List<T>> list) {
-        return list.foldLeft(list(), acc -> acc::concat);
+        return list.foldRight(list(), head -> head::concat);
     }
 
     public abstract <U> U foldLeft(U identity, Function<U, Function<T, U>> f);
+
+    public abstract <U> U foldRight(U identity, Function<T, Function<U, U>> f);
 
     public static <T> List<T> list() {
         return new Empty<>();
@@ -19,8 +21,7 @@ public abstract class List<T> {
     @SafeVarargs
     public static <T> List<T> list(T... args) {
         List<T> list = List.list();
-        for (int i = args.length - 1; i >= 0; i--)
-        {
+        for (int i = args.length - 1; i >= 0; i--) {
             list = list.append(args[i]);
         }
         return list;
@@ -36,12 +37,14 @@ public abstract class List<T> {
 
     public abstract <U> List<U> map(Function<T, U> f);
 
+    public abstract <U> List<U> flatMap(Function<T, List<U>> f);
+
     public abstract int size();
 
     public abstract boolean isEmpty();
 
     public List<T> concat(List<T> list) {
-        return foldLeft(list, acc -> head -> new Cons<>(head, list));
+        return foldRight(list, head -> acc -> new Cons<>(head, acc));
     }
 
     public abstract void forEach(SideEffect<T> effect);
@@ -59,6 +62,11 @@ public abstract class List<T> {
         }
 
         @Override
+        public <U> U foldRight(U identity, Function<T, Function<U, U>> f) {
+            return identity;
+        }
+
+        @Override
         public T head() {
             throw new IllegalStateException("head() called on empty list");
         }
@@ -70,6 +78,11 @@ public abstract class List<T> {
 
         @Override
         public <U> List<U> map(Function<T, U> f) {
+            return List.list();
+        }
+
+        @Override
+        public <U> List<U> flatMap(Function<T, List<U>> f) {
             return List.list();
         }
 
@@ -104,6 +117,11 @@ public abstract class List<T> {
         }
 
         @Override
+        public <U> List<U> flatMap(Function<T, List<U>> f) {
+            return flatten(map(f));
+        }
+
+        @Override
         public String toString() {
             return String.format("%s", head + ", " + tail.toString());
         }
@@ -111,6 +129,11 @@ public abstract class List<T> {
         @Override
         public <U> U foldLeft(U identity, Function<U, Function<T, U>> f) {
             return tail.foldLeft(f.apply(identity).apply(head), f);
+        }
+
+        @Override
+        public <U> U foldRight(U identity, Function<T, Function<U, U>> f) {
+            return f.apply(head).apply(tail.foldRight(identity, f));
         }
 
         @Override
